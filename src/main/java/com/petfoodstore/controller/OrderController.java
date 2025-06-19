@@ -122,7 +122,14 @@ public class OrderController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "invoice_" + order.getOrderNumber() + ".pdf");
+        try {
+            String filename = "Hóa đơn số_" + order.getOrderNumber() + ".pdf";
+            String encodedFilename = java.net.URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
+            headers.set("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFilename);
+        } catch (Exception e) {
+            // Fallback nếu encoding lỗi
+            headers.setContentDispositionFormData("attachment", "Invoice_" + order.getOrderNumber() + ".pdf");
+        }
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 
